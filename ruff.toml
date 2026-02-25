@@ -1,0 +1,12 @@
+line-length = 88
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "W", "UP"]
+ignore = []
+
+[format]
+quote-style = "single"
+
+[lint.per-file-ignores]
+"**/migrations/*.py" = ["E501"]

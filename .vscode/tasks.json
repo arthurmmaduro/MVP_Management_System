@@ -1,0 +1,85 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Tests (pytest)",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "pytest",
+                "-v",
+                "--maxfail=1",
+                "--disable-warnings",
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            },
+        },
+        {
+            "label": "Lint (ruff check --fix)",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "ruff",
+                "check",
+                ".",
+                "--fix",
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            },
+        },
+        {
+            "label": "Format (ruff format)",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "ruff",
+                "format",
+                ".",
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            },
+        },
+        {
+            "label": "Type-check (mypy)",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "mypy",
+                ".",
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            },
+        },
+        {
+            "label": "Coverage (pytest-cov)",
+            "type": "shell",
+            "command": "${workspaceFolder}/venv/Scripts/python.exe",
+            "args": [
+                "-m",
+                "pytest",
+                "--cov=.",
+                "--cov-report=term-missing",
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+            },
+        },
+    ],
+}

@@ -1,0 +1,99 @@
+{
+  "explorer.compactFolders": false,
+  "explorer.sortOrder": "type",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true
+  },
+  "search.exclude": {
+    "**/__pycache__": true,
+    "**/.mypy_cache": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true
+  },
+  "window.zoomLevel": 0.0,
+  "editor.fontFamily": "'JetBrainsMono', 'JetBrains Mono', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 14,
+  "editor.lineHeight": 22,
+  "editor.letterSpacing": 0.2,
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "none",
+  "editor.renderLineHighlight": "line",
+  "editor.cursorBlinking": "phase",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.wordWrap": "on",
+  "editor.stickyScroll.enabled": true,
+  "editor.hideCursorInOverviewRuler": true,
+  "breadcrumbs.enabled": true,
+  "problems.decorations.enabled": true,
+  "problems.showCurrentInStatus": true,
+  "terminal.integrated.environmentChangesRelaunch": true,
+  "terminal.integrated.environmentChangesIndicator": "off",
+  "terminal.integrated.fontFamily": "'JetBrainsMono', 'JetBrains Mono', monospace",
+  "terminal.integrated.scrollback": 5000,
+  "python.languageServer": "Pylance",
+  "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe",
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.organizeImports": "always"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true
+  },
+  "ruff.enable": true,
+  "ruff.lint.enable": true,
+  "ruff.format.enable": true,
+  "mypy-type-checker.importStrategy": "fromEnvironment",
+  "mypy-type-checker.args": ["--config-file=${workspaceFolder}/mypy.ini"],
+  "mypy-type-checker.cwd": "${nearestConfig}",
+  "mypy-type-checker.reportingScope": "file",
+  "mypy-type-checker.preferDaemon": false,
+  "mypy-type-checker.showNotifications": "onError",
+  "pylint.enabled": false,
+  "pylint.importStrategy": "fromEnvironment",
+  "pylint.args": ["--load-plugins=pylint_django"],
+  "[django-html]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "monosans.djlint",
+    "editor.quickSuggestions": {
+      "other": "on",
+      "comments": "on",
+      "strings": "on"
+    }
+  },
+  "files.associations": {
+    "**/templates/**/*.html": "django-html",
+    "**/base_templates/**/*.html": "django-html",
+    "**/requirements{/**,*}.{txt,in}": "pip-requirements"
+  },
+  "emmet.includeLanguages": {
+    "django-html": "html"
+  },
+  "html.format.wrapLineLength": 120,
+  "html.format.indentInnerHtml": true,
+  "zenMode.fullScreen": true,
+  "zenMode.hideStatusBar": true,
+  "zenMode.hideActivityBar": true,
+  "[json]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[jsonc]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+"editor.detectIndentation": false,
+  "workbench.colorTheme": "Dracula Theme"
+}
