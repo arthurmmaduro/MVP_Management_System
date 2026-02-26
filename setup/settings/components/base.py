@@ -1,5 +1,3 @@
-DEBUG = False
-
 ALLOWED_HOSTS: list[str] = []
 
 ROOT_URLCONF = 'setup.urls'

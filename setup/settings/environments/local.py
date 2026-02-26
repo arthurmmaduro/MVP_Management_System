@@ -5,6 +5,6 @@ SECRET_KEY = os.getenv(
     'django-insecure-local-change-this-before-production',
 )
 
-DEBUG = True
+DEBUG = os.getenv('DJANGO_DEBUG', 'true').lower() == 'true'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
