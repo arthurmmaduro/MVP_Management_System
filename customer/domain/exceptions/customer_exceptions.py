@@ -33,3 +33,8 @@ class CustomerSaveFailed(DomainException):
 class CustomerNotFound(DomainException):
     def __init__(self, customer_id: int) -> None:
         super().__init__(f'Cliente não encontrado: {customer_id}')
+
+
+class CustomerDeleteFailed(DomainException):
+    def __init__(self, customer_id: int) -> None:
+        super().__init__(f'Erro ao deletar o cliente: {customer_id}')

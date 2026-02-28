@@ -57,6 +57,68 @@ class TestCustomerModel(TestCase):
 
         self.assertEqual(customers, [active_customer])
 
+    def test_customer_manager_search_returns_only_active_matches(self):
+        active_customer = self._create_customer(name='Alpha Industries', is_active=True)
+        self._create_customer(name='Alpha Inactive', is_active=False)
+        self._create_customer(name='Beta Services', is_active=True)
+
+        customers = list(Customer.objects.search('Alpha'))
+
+        self.assertEqual(customers, [active_customer])
+
+    def test_customer_manager_active_returns_only_active_customers(self):
+        active_customer = self._create_customer(name='Only Active', is_active=True)
+        self._create_customer(name='Only Inactive', is_active=False)
+
+        customers = list(Customer.objects.active())
+
+        self.assertEqual(customers, [active_customer])
+
+    def test_customer_manager_order_by_name_orders_active_customers(self):
+        second_customer = self._create_customer(name='Zulu Customer', is_active=True)
+        first_customer = self._create_customer(name='Alpha Customer', is_active=True)
+        self._create_customer(name='Middle Inactive', is_active=False)
+
+        customers = list(Customer.objects.order_by_name())
+
+        self.assertEqual(customers, [first_customer, second_customer])
+
+    def test_customer_all_objects_active_returns_only_active_customers(self):
+        active_customer = self._create_customer(name='Active From All', is_active=True)
+        self._create_customer(name='Inactive From All', is_active=False)
+
+        customers = list(Customer.all_objects.active())
+
+        self.assertEqual(customers, [active_customer])
+
+    def test_customer_all_objects_inactive_returns_only_inactive_customers(self):
+        self._create_customer(name='Active From All', is_active=True)
+        inactive_customer = self._create_customer(
+            name='Inactive From All', is_active=False
+        )
+
+        customers = list(Customer.all_objects.inactive())
+
+        self.assertEqual(customers, [inactive_customer])
+
+    def test_customer_all_objects_search_returns_matching_customers(self):
+        active_customer = self._create_customer(name='Alpha Active', is_active=True)
+        inactive_customer = self._create_customer(name='Alpha Inactive', is_active=False)
+        self._create_customer(name='Beta Customer', is_active=True)
+
+        customers = list(Customer.all_objects.search('Alpha').order_by('id'))
+
+        self.assertEqual(customers, [active_customer, inactive_customer])
+
+    def test_customer_all_objects_order_by_name_orders_all_customers(self):
+        last_customer = self._create_customer(name='Zulu Customer', is_active=True)
+        first_customer = self._create_customer(name='Alpha Customer', is_active=False)
+        middle_customer = self._create_customer(name='Middle Customer', is_active=True)
+
+        customers = list(Customer.all_objects.order_by_name())
+
+        self.assertEqual(customers, [first_customer, middle_customer, last_customer])
+
     def test_created_by_is_required(self):
         with self.assertRaises(IntegrityError):
             with transaction.atomic():

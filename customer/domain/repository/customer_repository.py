@@ -17,3 +17,7 @@ class CustomerRepository(ABC):
     @abstractmethod
     def soft_delete(self, customer_id: int) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    def list_active(self) -> list[Customer]:
+        raise NotImplementedError
