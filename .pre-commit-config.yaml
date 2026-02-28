@@ -1,4 +1,17 @@
 repos:
+  - repo: local
+    hooks:
+      - id: freeze-requirements
+        name: freeze requirements.txt
+        entry: powershell.exe
+        language: system
+        pass_filenames: false
+        require_serial: true
+        always_run: true
+        args:
+          - -Command
+          - venv\Scripts\python.exe -m pip freeze | Set-Content requirements.txt
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
