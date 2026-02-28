@@ -10,7 +10,7 @@ load_dotenv(PROJECT_ROOT / '.env')
 ENV = os.getenv('DJANGO_ENV', 'local')
 
 include(
-    'components/path.py',
+    'components/base_dir_path.py',
     'components/base.py',
     'components/apps.py',
     'components/templates.py',
@@ -18,6 +18,7 @@ include(
     'components/auth.py',
     'components/i18n.py',
     'components/static.py',
+    'components/logging.py',
     'infrastructure/database.py',
     f'environments/{ENV}.py',
     optional('environments/local_override.py'),

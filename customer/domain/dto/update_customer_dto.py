@@ -2,12 +2,12 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True, slots=True)
-class CreateCustomerInput:
+class UpdateCustomerInput:
+    customer_id: int
     name: str
-    created_by: int
     updated_by: int
 
 
 @dataclass(frozen=True, slots=True)
-class CreateCustomerOutput:
+class UpdateCustomerOutput:
     customer_id: int
