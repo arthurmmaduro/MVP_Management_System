@@ -161,5 +161,5 @@ class DeleteCustomerViewTest(TestCase):
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertIn('/accounts/login/', response)
+        self.assertIn('/accounts/login/', response['location'])
         get_service_mock.assert_not_called()

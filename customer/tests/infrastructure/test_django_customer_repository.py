@@ -134,3 +134,25 @@ class TestDjangoCustomerRepository(TestCase):
         customers = self.repository.list_active()
 
         self.assertEqual(customers, [])
+
+    def test_list_active_filters_customers_by_search(self):
+        alpha_customer = Customer.objects.create(
+            name='Alpha Customer',
+            created_by=self.user,
+            updated_by=self.user,
+        )
+        Customer.objects.create(
+            name='Zulu Customer',
+            created_by=self.user,
+            updated_by=self.user,
+        )
+        Customer.all_objects.create(
+            name='Inactive Alpha Customer',
+            is_active=False,
+            created_by=self.user,
+            updated_by=self.user,
+        )
+
+        customers = self.repository.list_active(search='Alpha')
+
+        self.assertEqual(customers, [alpha_customer])

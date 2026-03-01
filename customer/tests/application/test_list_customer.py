@@ -59,3 +59,27 @@ class TestListCustomerService(TestCase):
         output = service.execute()
 
         self.assertEqual(output.customers, [])
+
+    def test_execute_filters_active_customers_by_search(self):
+        Customer.objects.create(
+            name='Alpha Customer',
+            created_by_id=self.user.id,
+            updated_by_id=self.user.id,
+        )
+        Customer.objects.create(
+            name='Zulu Customer',
+            created_by_id=self.user.id,
+            updated_by_id=self.user.id,
+        )
+        Customer.all_objects.create(
+            name='Inactive Alpha Customer',
+            is_active=False,
+            created_by_id=self.user.id,
+            updated_by_id=self.user.id,
+        )
+        service = ListCustomerService(self.repository)
+
+        output = service.execute(search='Alpha')
+
+        self.assertEqual(len(output.customers), 1)
+        self.assertEqual(output.customers[0].name, 'Alpha Customer')

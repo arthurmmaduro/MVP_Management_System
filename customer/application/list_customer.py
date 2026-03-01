@@ -10,11 +10,11 @@ class ListCustomerService:
     def __init__(self, repository: CustomerRepository) -> None:
         self.repository = repository
 
-    def execute(self) -> CustomerListOutput:
+    def execute(self, search: str = '') -> CustomerListOutput:
         logger.info('Starting customer list')
         customers = [
             CustomerListItem(customer_id=customer.id, name=customer.name)
-            for customer in self.repository.list_active()
+            for customer in self.repository.list_active(search=search)
         ]
 
         logger.info('Customer list loaded successfully count=%s', len(customers))

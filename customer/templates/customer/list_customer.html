@@ -27,21 +27,16 @@
                     </tbody>
                 </table>
                 {% if is_paginated %}
-                    <nav aria-label="Paginação de clientes">
-                        {% if page_obj.has_previous %}
-                            <a href="?page=1">Primeira</a>
-                            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                        {% endif %}
-                        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-                        {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
-                            <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
-                        {% endif %}
-                    </nav>
+                    {% include "partials/ui/_pagination.html" with pagination_aria_label="Paginação de clientes" %}
                 {% endif %}
             {% else %}
-                <h3>Nenhum cliente cadastrado</h3>
-                <p>Cadastre o seu primeiro cliente</p>
+                {% if search %}
+                    <h3>Nenhum cliente encontrado</h3>
+                    <p>Nenhum cliente corresponde à busca por "{{ search }}".</p>
+                {% else %}
+                    <h3>Nenhum cliente cadastrado</h3>
+                    <p>Cadastre o seu primeiro cliente</p>
+                {% endif %}
             {% endif %}
         </div>
     </div>

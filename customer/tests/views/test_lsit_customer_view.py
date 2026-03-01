@@ -30,6 +30,7 @@ class ListCustomerViewTest(TestCase):
 
         response = self.client.get(self.url)
 
+        service_mock.execute.assert_called_once_with(search='')
         self.assertEqual(len(response.context['customers']), 2)
         self.assertEqual(response.context['customers'][0].name, 'Alpha Customer')
         self.assertEqual(response.context['customers'][1].name, 'Zulu Customer')
@@ -46,10 +47,30 @@ class ListCustomerViewTest(TestCase):
 
         response = self.client.get(self.url)
 
+        service_mock.execute.assert_called_once_with(search='')
         self.assertEqual(response.context['customers'], [])
         self.assertContains(response, 'Nenhum cliente cadastrado')
         self.assertContains(response, 'Cadastre o seu primeiro cliente')
         self.assertFalse(response.context['is_paginated'])
+
+    @patch('customer.views.list_customer_view.ListCustomerView.get_service')
+    def test_list_customer_view_shows_empty_search_state_when_no_results_are_found(
+        self, get_service_mock
+    ):
+        service_mock = Mock()
+        service_mock.execute.return_value = SimpleNamespace(customers=[])
+        get_service_mock.return_value = service_mock
+
+        response = self.client.get(self.url, {'search': 'Alpha'})
+
+        service_mock.execute.assert_called_once_with(search='Alpha')
+        self.assertContains(response, 'Nenhum cliente encontrado')
+        self.assertContains(
+            response,
+            'Nenhum cliente corresponde à busca por "Alpha".',
+            html=False,
+        )
+        self.assertNotContains(response, 'Nenhum cliente cadastrado')
 
     @patch('customer.views.list_customer_view.ListCustomerView.get_service')
     def test_list_customer_view_renders_customer_names_in_html(self, get_service_mock):
@@ -128,3 +149,36 @@ class ListCustomerViewTest(TestCase):
         self.assertContains(response, 'Customer 11')
         self.assertContains(response, 'Customer 12')
         self.assertNotContains(response, 'href="/customers/1/"', html=False)
+
+    @patch('customer.views.list_customer_view.ListCustomerView.get_service')
+    def test_list_customer_view_passes_search_to_service_and_context(
+        self, get_service_mock
+    ):
+        service_mock = Mock()
+        service_mock.execute.return_value = SimpleNamespace(
+            customers=[SimpleNamespace(customer_id=1, name='Alpha Customer')]
+        )
+        get_service_mock.return_value = service_mock
+
+        response = self.client.get(self.url, {'search': ' Alpha '})
+
+        service_mock.execute.assert_called_once_with(search='Alpha')
+        self.assertEqual(response.context['search'], 'Alpha')
+        self.assertContains(response, 'value="Alpha"', html=False)
+
+    @patch('customer.views.list_customer_view.ListCustomerView.get_service')
+    def test_list_customer_view_preserves_search_in_pagination_links(
+        self, get_service_mock
+    ):
+        service_mock = Mock()
+        service_mock.execute.return_value = SimpleNamespace(
+            customers=[
+                SimpleNamespace(customer_id=index, name=f'Customer {index}')
+                for index in range(1, 13)
+            ]
+        )
+        get_service_mock.return_value = service_mock
+
+        response = self.client.get(self.url, {'search': 'Alpha'})
+
+        self.assertContains(response, '?page=2&amp;search=Alpha', html=False)

@@ -19,5 +19,5 @@ class CustomerRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def list_active(self) -> list[Customer]:
+    def list_active(self, search: str = '') -> list[Customer]:
         raise NotImplementedError

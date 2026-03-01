@@ -11,6 +11,7 @@ from customer.domain.exceptions.customer_exceptions import (
 )
 from customer.domain.repository.customer_repository import CustomerRepository
 from customer.models import Customer
+from customer.models.customer_queryset import CustomerQueryset
 
 logger = logging.getLogger(__name__)
 
@@ -50,5 +51,10 @@ class DjangoCustomerRepository(CustomerRepository):
             )
             raise CustomerDeleteFailed(customer_id=customer_id) from exc
 
-    def list_active(self) -> list[Customer]:
-        return list(Customer.objects.order_by_name())
+    def list_active(self, search: str = '') -> list[Customer]:
+        qs: CustomerQueryset = Customer.objects.get_queryset()
+
+        if search:
+            qs = qs.search(search)
+
+        return list(qs.order_by_name())
