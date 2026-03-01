@@ -10,6 +10,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS: list[str] = []
 
 LOCAL_APPS: list[str] = [
+    'audit.apps.AuditConfig',
     'home.apps.HomeConfig',
     'customer.apps.CustomerConfig',
 ]
