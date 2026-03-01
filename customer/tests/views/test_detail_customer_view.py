@@ -4,7 +4,10 @@ from unittest.mock import Mock, patch
 from django.test import TestCase
 from django.urls import reverse
 
+from customer.application.detail_customer import DetailCustomerService
 from customer.domain.exceptions.customer_exceptions import CustomerNotFound
+from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
+from customer.views.detail_customer_view import DetailCustomerView
 
 
 class DetailCustomerViewTest(TestCase):
@@ -45,6 +48,15 @@ class DetailCustomerViewTest(TestCase):
             response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'customer/detail_customer.html')
+
+    def test_detail_customer_view_get_service_returns_service_instance(self):
+        view = DetailCustomerView()
+
+        self.assertIsInstance(view.get_service(), DetailCustomerService)
+        self.assertIsInstance(
+            view.get_service().repository,
+            DjangoCustomerRepository,
+        )
 
     @patch('customer.views.detail_customer_view.DetailCustomerView.get_service')
     def test_detail_customer_view_returns_customer_in_context(self, get_service_mock):

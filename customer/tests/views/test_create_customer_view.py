@@ -6,7 +6,9 @@ from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 
+from customer.application.create_customer import CreateCustomerService
 from customer.domain.exceptions.customer_exceptions import CustomerAlreadyExists
+from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
 
 
 class CreateCustomerViewTest(TestCase):
@@ -33,6 +35,17 @@ class CreateCustomerViewTest(TestCase):
 
         self.assertEqual(response.context['cancel_url'], self.list_url)
         self.assertFalse(response.context['is_update'])
+
+    def test_create_customer_view_get_service_returns_service_instance(self):
+        response = self.client.get(self.url)
+
+        self.assertIsInstance(
+            response.context['view'].get_service(), CreateCustomerService
+        )
+        self.assertIsInstance(
+            response.context['view'].get_service().repository,
+            DjangoCustomerRepository,
+        )
 
     @patch('customer.views.create_customer_view.CreateCustomerView.get_service')
     def test_create_customer_view_creates_customer_and_redirects(
@@ -85,3 +98,14 @@ class CreateCustomerViewTest(TestCase):
         self.assertTrue(response.context['form'].errors['name'])
         self.assertIn('obrigat', response.context['form'].errors['name'][0].lower())
         get_service_mock.return_value.execute.assert_not_called()
+
+    @patch('customer.views.create_customer_view.CreateCustomerView.get_service')
+    def test_create_customer_view_requires_authenticated_user(self, get_service_mock):
+        response = self.client.post(self.url, data={'name': 'Alpha Customer'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('__all__', response.context['form'].errors)
+        self.assertIn(
+            'autenticado', response.context['form'].errors['__all__'][0].lower()
+        )
+        get_service_mock.assert_not_called()

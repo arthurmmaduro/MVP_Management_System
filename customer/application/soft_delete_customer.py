@@ -28,7 +28,10 @@ class SoftDeleteCustomerService:
             )
             raise CustomerNotFound(input_dto.customer_id)
 
-        self.repository.soft_delete(customer_id=customer.id)
+        self.repository.soft_delete(
+            customer_id=customer.id,
+            updated_by=input_dto.updated_by,
+        )
 
         logger.info('Customer soft deleted successfully id=%s', customer.id)
         return SoftDeleteCustomerOutput(customer_id=customer.id)

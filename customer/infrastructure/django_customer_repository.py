@@ -38,9 +38,12 @@ class DjangoCustomerRepository(CustomerRepository):
         except Customer.DoesNotExist:
             return None
 
-    def soft_delete(self, customer_id: int) -> None:
+    def soft_delete(self, customer_id: int, updated_by: int) -> None:
         try:
-            Customer.all_objects.filter(id=customer_id).update(is_active=False)
+            customer = Customer.all_objects.get(id=customer_id)
+            customer.is_active = False
+            customer.updated_by_id = updated_by
+            customer.save(update_fields=['is_active', 'updated_by', 'updated_at'])
         except DatabaseError as exc:
             logger.exception(
                 'Database error while soft deleting customer id=%s', customer_id

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.views import redirect_to_login
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
@@ -40,9 +41,16 @@ class DeleteCustomerView(TemplateView):
         *args: object,
         **kwargs: object,
     ) -> HttpResponse:
+        user_id = request.user.id
+        if user_id is None:
+            return redirect_to_login(request.get_full_path())
+
         try:
             output = self.get_service().execute(
-                SoftDeleteCustomerInput(customer_id=self.kwargs['pk'])
+                SoftDeleteCustomerInput(
+                    customer_id=self.kwargs['pk'],
+                    updated_by=user_id,
+                )
             )
         except CustomerNotFound as exc:
             raise Http404(str(exc)) from exc

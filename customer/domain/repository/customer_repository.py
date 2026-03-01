@@ -15,7 +15,7 @@ class CustomerRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def soft_delete(self, customer_id: int) -> None:
+    def soft_delete(self, customer_id: int, updated_by: int) -> None:
         raise NotImplementedError
 
     @abstractmethod

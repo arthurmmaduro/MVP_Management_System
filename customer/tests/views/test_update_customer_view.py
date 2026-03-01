@@ -7,10 +7,13 @@ from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
 
+from customer.application.update_customer import UpdateCustomerService
 from customer.domain.exceptions.customer_exceptions import (
     CustomerAlreadyExists,
     CustomerNotFound,
 )
+from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
+from customer.views.update_customer_view import UpdateCustomerView
 
 
 class UpdateCustomerViewTest(TestCase):
@@ -60,6 +63,53 @@ class UpdateCustomerViewTest(TestCase):
         self.assertTrue(response.context['is_update'])
         self.assertEqual(response.context['customer'].id, self.customer_id)
         self.assertEqual(response.context['form'].initial['name'], 'Alpha Customer')
+
+    @patch('customer.views.update_customer_view.UpdateCustomerView.get_customer')
+    def test_update_customer_view_get_service_returns_service_instance(
+        self, get_customer_mock
+    ):
+        get_customer_mock.return_value = SimpleNamespace(
+            id=self.customer_id,
+            name='Alpha Customer',
+        )
+
+        response = self.client.get(self.url)
+
+        self.assertIsInstance(
+            response.context['view'].get_service(), UpdateCustomerService
+        )
+        self.assertIsInstance(
+            response.context['view'].get_service().repository,
+            DjangoCustomerRepository,
+        )
+
+    @patch('customer.views.update_customer_view.DjangoCustomerRepository.get_by_id')
+    def test_update_customer_view_get_customer_caches_repository_result(
+        self, get_by_id_mock
+    ):
+        customer = SimpleNamespace(id=self.customer_id, name='Alpha Customer')
+        get_by_id_mock.return_value = customer
+
+        response = self.client.get(self.url)
+        view = response.context['view']
+
+        first_customer = view.get_customer()
+        second_customer = view.get_customer()
+
+        self.assertIs(first_customer, customer)
+        self.assertIs(second_customer, customer)
+        get_by_id_mock.assert_called_once_with(self.customer_id)
+
+    @patch('customer.views.update_customer_view.DjangoCustomerRepository.get_by_id')
+    def test_update_customer_view_get_customer_raises_404_when_repository_returns_none(
+        self, get_by_id_mock
+    ):
+        get_by_id_mock.return_value = None
+        view = UpdateCustomerView()
+        view.kwargs = {'pk': self.customer_id}
+
+        with self.assertRaises(Http404):
+            view.get_customer()
 
     @patch('customer.views.update_customer_view.UpdateCustomerView.get_customer')
     @patch('customer.views.update_customer_view.UpdateCustomerView.get_service')
@@ -158,3 +208,21 @@ class UpdateCustomerViewTest(TestCase):
         response = self.client.post(self.url, data={'name': 'Updated Customer'})
 
         self.assertEqual(response.status_code, 404)
+
+    @patch('customer.views.update_customer_view.UpdateCustomerView.get_customer')
+    @patch('customer.views.update_customer_view.UpdateCustomerView.get_service')
+    def test_update_customer_view_requires_authenticated_user(
+        self, get_service_mock, get_customer_mock
+    ):
+        get_customer_mock.return_value = SimpleNamespace(
+            id=self.customer_id,
+            name='Alpha Customer',
+        )
+        response = self.client.post(self.url, data={'name': 'Updated Customer'})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn('__all__', response.context['form'].errors)
+        self.assertIn(
+            'autenticado', response.context['form'].errors['__all__'][0].lower()
+        )
+        get_service_mock.assert_not_called()
