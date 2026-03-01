@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <h1>Confirmar exclusão</h1>
+        <p>Tem certeza que deseja excluir o cliente "{{ customer.name }}"?</p>
+        <p>
+            <strong>Essa ação não pode ser desfeita.</strong>
+        </p>
+    </div>
+    <div>
+        <form method="post" action="{% url "customer:delete" customer.pk %}">
+            {% csrf_token %}
+            <button type="submit">Confirmar exclusão</button>
+        </form>
+        <a href="{% url "customer:detail" customer.pk %}">Cancelar</a>
+    </div>
+{% endblock content %}

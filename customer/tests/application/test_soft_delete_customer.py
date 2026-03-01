@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -49,3 +51,35 @@ class TestSoftDeleteCustomerService(TestCase):
 
         with self.assertRaises(CustomerNotFound):
             service.execute(SoftDeleteCustomerInput(customer_id=customer.id))
+
+    def test_execute_logs_successful_soft_delete(self):
+        customer = Customer.objects.create(
+            name='Customer To Delete',
+            created_by_id=self.user.id,
+            updated_by_id=self.user.id,
+        )
+        service = SoftDeleteCustomerService(self.repository)
+
+        with patch('customer.application.soft_delete_customer.logger') as logger_mock:
+            service.execute(SoftDeleteCustomerInput(customer_id=customer.id))
+
+        logger_mock.info.assert_any_call(
+            'Starting customer soft delete id=%s', customer.id
+        )
+        logger_mock.info.assert_any_call(
+            'Customer soft deleted successfully id=%s', customer.id
+        )
+
+    def test_execute_logs_warning_when_soft_delete_customer_is_not_found(self):
+        service = SoftDeleteCustomerService(self.repository)
+
+        with patch('customer.application.soft_delete_customer.logger') as logger_mock:
+            with self.assertRaises(CustomerNotFound):
+                service.execute(SoftDeleteCustomerInput(customer_id=9999))
+
+        logger_mock.info.assert_called_once_with(
+            'Starting customer soft delete id=%s', 9999
+        )
+        logger_mock.warning.assert_called_once_with(
+            'Customer not found for soft delete id=%s', 9999
+        )

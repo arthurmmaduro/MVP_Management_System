@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sistema de Gestão</title>
+    </head>
+    <body>
+        {% include "partials/structure/_header.html" %}
+        {% include "partials/structure/_sidebar.html" %}
+        {% include "partials/ui/_message.html" %}
+        <main>
+            {% block content %}
+            {% endblock content %}
+        </main>
+        {% include "partials/structure/_footer.html" %}
+    </body>
+</html>

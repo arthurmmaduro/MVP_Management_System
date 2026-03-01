@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div>
+            {% if is_update %}
+                <h1>Atualizar Cliente</h1>
+            {% else %}
+                <h1>Novo Cliente</h1>
+            {% endif %}
+        </div>
+        <div>
+            {% include "partials/forms/_form.html" with form=form submit_label="Salvar" cancel_url=cancel_url cancel_label="Cancelar" %}
+        </div>
+    </div>
+{% endblock content %}

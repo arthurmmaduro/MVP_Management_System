@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
@@ -87,3 +89,20 @@ class TestCreateCustomerService(TestCase):
                     updated_by=self.user.id,
                 )
             )
+
+    def test_execute_logs_start_and_success(self):
+        service = CreateCustomerService(self.repository)
+
+        with patch('customer.application.create_customer.logger') as logger_mock:
+            output = service.execute(
+                CreateCustomerInput(
+                    name='Test Customer',
+                    created_by=self.user.id,
+                    updated_by=self.user.id,
+                )
+            )
+
+        logger_mock.info.assert_any_call('Starting customer creation')
+        logger_mock.info.assert_any_call(
+            'Customer created successfully id=%s', output.customer_id
+        )

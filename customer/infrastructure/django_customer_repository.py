@@ -36,7 +36,6 @@ class DjangoCustomerRepository(CustomerRepository):
         try:
             return Customer.objects.get(id=customer_id)
         except Customer.DoesNotExist:
-            logger.info('Customer not found in repository id=%s', customer_id)
             return None
 
     def soft_delete(self, customer_id: int) -> None:

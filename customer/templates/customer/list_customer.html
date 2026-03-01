@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <div>
+            <h1>Clientes Cadastrados</h1>
+        </div>
+        <div>
+            <a href="{% url "customer:create" %}">Cadastrar Cliente</a>
+        </div>
+        <div>{% include "partials/ui/_search_bar.html" %}</div>
+        <div>
+            {% if customers %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                            <tr>
+                                <td>
+                                    <a href="{% url "customer:detail" customer.customer_id %}">{{ customer.name }}</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if is_paginated %}
+                    <nav aria-label="Paginação de clientes">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1">Primeira</a>
+                            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                        {% endif %}
+                        <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                        {% endif %}
+                    </nav>
+                {% endif %}
+            {% else %}
+                <h3>Nenhum cliente cadastrado</h3>
+                <p>Cadastre o seu primeiro cliente</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

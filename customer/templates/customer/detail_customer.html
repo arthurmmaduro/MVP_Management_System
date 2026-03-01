@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+    <div>
+        <h1>Informações do Cliente</h1>
+        <p>ID: {{ customer.customer_id }}</p>
+        <p>Nome: {{ customer.name }}</p>
+    </div>
+    <div>
+        <p>Aqui vão as futuras informações do cliente.</p>
+    </div>
+    <div>
+        <a href="{% url "customer:update" customer.customer_id %}">Atualizar</a>
+        <a href="{% url "customer:delete" customer.customer_id %}">Excluir</a>
+        <a href="{% url "customer:list" %}">Voltar</a>
+    </div>
+{% endblock content %}
