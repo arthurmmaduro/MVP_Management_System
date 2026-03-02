@@ -11,6 +11,7 @@ THIRD_PARTY_APPS: list[str] = []
 
 LOCAL_APPS: list[str] = [
     'audit.apps.AuditConfig',
+    'notification.apps.NotificationConfig',
     'home.apps.HomeConfig',
     'customer.apps.CustomerConfig',
 ]
