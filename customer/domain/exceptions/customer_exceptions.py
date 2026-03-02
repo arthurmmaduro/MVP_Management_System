@@ -30,6 +30,16 @@ class CustomerSaveFailed(DomainException):
         super().__init__(f'Erro ao salvar o cliente: {name}')
 
 
+class CustomerCreateFailed(DomainException):
+    def __init__(self) -> None:
+        super().__init__('Nao foi possível cadastrar o cliente')
+
+
+class CustomerAuditFailed(CustomerCreateFailed):
+    def __init__(self) -> None:
+        super().__init__()
+
+
 class CustomerNotFound(DomainException):
     def __init__(self, customer_id: int) -> None:
         super().__init__(f'Cliente não encontrado: {customer_id}')

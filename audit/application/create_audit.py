@@ -13,7 +13,7 @@ class CreateAuditService:
         AuditValidator.validate(input_dto)
 
         audit = Audit(
-            action=input_dto.action,
+            action=input_dto.action.value,
             entity_type=input_dto.entity_type,
             entity_id=input_dto.entity_id,
             description=input_dto.description,

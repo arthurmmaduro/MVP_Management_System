@@ -3,6 +3,9 @@ from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import FormView
 
+from audit.application.create_audit import CreateAuditService
+from audit.infrastructure.customer_audit_adapter import CustomerAuditAdapter
+from audit.infrastructure.django_audit_repository import DjangoAuditRepository
 from common.domain.exceptions.base_exception import DomainException
 from customer.application.create_customer import CreateCustomerService
 from customer.forms.customer_forms import CreateCustomerForm
@@ -16,7 +19,10 @@ class CreateCustomerView(FormView):
 
     def get_service(self) -> CreateCustomerService:
         repository = DjangoCustomerRepository()
-        return CreateCustomerService(repository)
+        audit_repository = DjangoAuditRepository()
+        audit_service = CreateAuditService(audit_repository)
+        audit_gateway = CustomerAuditAdapter(audit_service)
+        return CreateCustomerService(repository, audit_gateway)
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context = super().get_context_data(**kwargs)
