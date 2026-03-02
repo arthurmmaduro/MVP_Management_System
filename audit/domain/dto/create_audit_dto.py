@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from audit.models.audit import AuditAction
+from audit.domain.enums.audit_action import AuditAction
 
 
 @dataclass(frozen=True, slots=True)

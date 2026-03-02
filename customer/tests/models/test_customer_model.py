@@ -103,7 +103,9 @@ class TestCustomerModel(TestCase):
 
     def test_customer_all_objects_search_returns_matching_customers(self):
         active_customer = self._create_customer(name='Alpha Active', is_active=True)
-        inactive_customer = self._create_customer(name='Alpha Inactive', is_active=False)
+        inactive_customer = self._create_customer(
+            name='Alpha Inactive', is_active=False
+        )
         self._create_customer(name='Beta Customer', is_active=True)
 
         customers = list(Customer.all_objects.search('Alpha').order_by('id'))

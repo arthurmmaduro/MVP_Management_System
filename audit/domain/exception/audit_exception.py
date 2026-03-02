@@ -8,3 +8,8 @@ class AuditSaveFailed(DomainException):
         super().__init__(
             f'Falha ao criar o audit log de "{action}" para "{entity_type}"'
         )
+
+
+class EntityTypeEmpty(DomainException):
+    def __init__(self) -> None:
+        super().__init__('O tipo de entidade do log de auditoria nao pode ser vazio')

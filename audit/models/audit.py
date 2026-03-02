@@ -1,17 +1,15 @@
 from django.conf import settings
 from django.db import models
 
+from audit.domain.enums.audit_action import AuditAction
 
-class AuditAction(models.TextChoices):
-    CREATE = 'create', 'Create'
-    UPDATE = 'update', 'Update'
-    SOFT_DELETE = 'soft_delete', 'Soft Delete'
-    HARD_DELETE = 'hard_delete', 'Hard Delete'
-    VIEW = 'view', 'View'
+AUDIT_ACTION_CHOICES = [
+    (action.value, action.name.replace('_', ' ').title()) for action in AuditAction
+]
 
 
 class Audit(models.Model):
-    action = models.CharField(max_length=50, choices=AuditAction.choices)
+    action = models.CharField(max_length=50, choices=AUDIT_ACTION_CHOICES)
     entity_type = models.CharField(max_length=100)
     entity_id = models.BigIntegerField(null=True, blank=True)
     description = models.TextField(blank=True)
