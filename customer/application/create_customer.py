@@ -7,7 +7,7 @@ from customer.domain.dto.create_customer_dto import (
     CreateCustomerInput,
     CreateCustomerOutput,
 )
-from customer.domain.exceptions.customer_exceptions import CustomerAuditFailed
+from customer.domain.exceptions.customer_exceptions import CustomerAuditOperationFailed
 from customer.domain.repository.customer_audit_gateway import CustomerAuditGateway
 from customer.domain.repository.customer_repository import CustomerRepository
 from customer.domain.validator.customer_name_validator import CustomerNameValidator
@@ -43,7 +43,7 @@ class CreateCustomerService:
                 'Audit failure during customer creation customer_id=%s',
                 customer.id,
             )
-            raise CustomerAuditFailed() from exc
+            raise CustomerAuditOperationFailed() from exc
 
         logger.info('Customer created successfully id=%s', customer.id)
         return CreateCustomerOutput(customer_id=customer.id)

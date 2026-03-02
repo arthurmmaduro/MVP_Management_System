@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from audit.domain.enums.audit_action import AuditAction
@@ -9,7 +10,7 @@ class CreateAuditInput:
     entity_type: str
     entity_id: int | None
     description: str
-    metadata: dict[str, object]
+    metadata: Mapping[str, object]
     created_by: int
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 
 
 class CustomerAuditGateway(ABC):
@@ -8,10 +9,12 @@ class CustomerAuditGateway(ABC):
     def log_customer_created(self, *, customer_id: int, created_by: int) -> None:
         raise NotImplementedError
 
+    @abstractmethod
     def log_customer_updated(
-        self, *, customer_id: int, updated_by: int, metadata: dict
+        self, *, customer_id: int, updated_by: int, metadata: Mapping[str, object]
     ) -> None:
         raise NotImplementedError
 
+    @abstractmethod
     def log_customer_deleted(self, *, customer_id: int, deleted_by: int) -> None:
         raise NotImplementedError

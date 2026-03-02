@@ -3,6 +3,9 @@ from django.http import Http404, HttpResponse
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
 
+from audit.application.create_audit import CreateAuditService
+from audit.infrastructure.customer_audit_adapter import CustomerAuditAdapter
+from audit.infrastructure.django_audit_repository import DjangoAuditRepository
 from common.domain.exceptions.base_exception import DomainException
 from customer.application.update_customer import UpdateCustomerService
 from customer.domain.exceptions.customer_exceptions import CustomerNotFound
@@ -19,7 +22,10 @@ class UpdateCustomerView(FormView):
 
     def get_service(self) -> UpdateCustomerService:
         repository = DjangoCustomerRepository()
-        return UpdateCustomerService(repository)
+        audit_repository = DjangoAuditRepository()
+        audit_service = CreateAuditService(audit_repository)
+        audit_gateway = CustomerAuditAdapter(audit_service)
+        return UpdateCustomerService(repository, audit_gateway)
 
     def get_customer(self):
         if self._customer is not None:

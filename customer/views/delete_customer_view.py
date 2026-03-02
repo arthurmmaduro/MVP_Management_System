@@ -4,6 +4,9 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
+from audit.application.create_audit import CreateAuditService
+from audit.infrastructure.customer_audit_adapter import CustomerAuditAdapter
+from audit.infrastructure.django_audit_repository import DjangoAuditRepository
 from customer.application.soft_delete_customer import SoftDeleteCustomerService
 from customer.domain.dto.soft_delete_customer_dto import SoftDeleteCustomerInput
 from customer.domain.exceptions.customer_exceptions import CustomerNotFound
@@ -17,7 +20,10 @@ class DeleteCustomerView(TemplateView):
 
     def get_service(self) -> SoftDeleteCustomerService:
         repository = DjangoCustomerRepository()
-        return SoftDeleteCustomerService(repository)
+        audit_repository = DjangoAuditRepository()
+        audit_service = CreateAuditService(audit_repository)
+        audit_gateway = CustomerAuditAdapter(audit_service)
+        return SoftDeleteCustomerService(repository, audit_gateway)
 
     def get_customer(self) -> Customer:
         if self._customer is not None:

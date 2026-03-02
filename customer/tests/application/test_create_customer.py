@@ -8,7 +8,7 @@ from customer.application.create_customer import CreateCustomerService
 from customer.domain.dto.create_customer_dto import CreateCustomerInput
 from customer.domain.exceptions.customer_exceptions import (
     CustomerAlreadyExists,
-    CustomerAuditFailed,
+    CustomerAuditOperationFailed,
     CustomerNameIsEmpty,
     CustomerNameIsTooShort,
 )
@@ -104,7 +104,7 @@ class TestCreateCustomerService(TestCase):
             'create', 'customer'
         )
 
-        with self.assertRaises(CustomerAuditFailed):
+        with self.assertRaises(CustomerAuditOperationFailed):
             service.execute(
                 CreateCustomerInput(
                     name='Test Customer',
@@ -122,7 +122,7 @@ class TestCreateCustomerService(TestCase):
         )
 
         with patch('customer.application.create_customer.logger') as logger_mock:
-            with self.assertRaises(CustomerAuditFailed):
+            with self.assertRaises(CustomerAuditOperationFailed):
                 service.execute(
                     CreateCustomerInput(
                         name='Test Customer',

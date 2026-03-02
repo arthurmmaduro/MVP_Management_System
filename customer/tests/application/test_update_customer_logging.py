@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase
@@ -6,6 +6,7 @@ from django.test import TestCase
 from customer.application.update_customer import UpdateCustomerService
 from customer.domain.dto.update_customer_dto import UpdateCustomerInput
 from customer.domain.exceptions.customer_exceptions import CustomerNotFound
+from customer.domain.repository.customer_audit_gateway import CustomerAuditGateway
 from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
 from customer.models import Customer
 
@@ -22,6 +23,7 @@ class TestUpdateCustomerServiceLogging(TestCase):
             password='testpassword',
         )
         self.repository = DjangoCustomerRepository()
+        self.audit_gateway = Mock(spec=CustomerAuditGateway)
 
     def test_execute_logs_successful_update(self):
         customer = Customer.objects.create(
@@ -29,7 +31,7 @@ class TestUpdateCustomerServiceLogging(TestCase):
             created_by_id=self.user.id,
             updated_by_id=self.user.id,
         )
-        service = UpdateCustomerService(self.repository)
+        service = UpdateCustomerService(self.repository, self.audit_gateway)
 
         with patch('customer.application.update_customer.logger') as logger_mock:
             service.execute(
@@ -46,7 +48,7 @@ class TestUpdateCustomerServiceLogging(TestCase):
         )
 
     def test_execute_logs_warning_when_customer_is_not_found(self):
-        service = UpdateCustomerService(self.repository)
+        service = UpdateCustomerService(self.repository, self.audit_gateway)
 
         with patch('customer.application.update_customer.logger') as logger_mock:
             with self.assertRaises(CustomerNotFound):

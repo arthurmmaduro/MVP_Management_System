@@ -35,7 +35,7 @@ class CustomerCreateFailed(DomainException):
         super().__init__('Nao foi possível cadastrar o cliente')
 
 
-class CustomerAuditFailed(CustomerCreateFailed):
+class CustomerAuditOperationFailed(CustomerCreateFailed):
     def __init__(self) -> None:
         super().__init__()
 
