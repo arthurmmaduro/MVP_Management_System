@@ -24,6 +24,8 @@ class CreateNotificationService:
             entity_id=input_dto.entity_id,
             triggered_by_id=input_dto.triggered_by,
             audience=input_dto.audience.value,
+            description=input_dto.description,
+            metadata=input_dto.metadata,
         )
         self._notification_repository.save(notification=notification)
         return CreateNotificationOutput(notification_id=notification.id)

@@ -12,17 +12,25 @@ from customer.domain.exceptions.customer_exceptions import (
     CustomerNotFound,
 )
 from customer.domain.repository.customer_audit_gateway import CustomerAuditGateway
+from customer.domain.repository.customer_notification_gateway import (
+    CustomerNotificationGateway,
+)
 from customer.domain.repository.customer_repository import CustomerRepository
+from notification.domain.exceptions.notification_exception import NotificationSaveFailed
 
 logger = logging.getLogger(__name__)
 
 
 class SoftDeleteCustomerService:
     def __init__(
-        self, repository: CustomerRepository, audit_gateway: CustomerAuditGateway
+        self,
+        repository: CustomerRepository,
+        audit_gateway: CustomerAuditGateway,
+        notification_gateway: CustomerNotificationGateway,
     ) -> None:
         self.repository = repository
         self.audit_gateway = audit_gateway
+        self.notification_gateway = notification_gateway
 
     @transaction.atomic
     def execute(self, input_dto: SoftDeleteCustomerInput) -> SoftDeleteCustomerOutput:
@@ -49,6 +57,17 @@ class SoftDeleteCustomerService:
                 customer.id,
             )
             raise CustomerAuditOperationFailed() from exc
+
+        try:
+            self.notification_gateway.notify_customer_deleted(
+                customer_id=customer.id,
+                triggered_by=input_dto.updated_by,
+            )
+        except NotificationSaveFailed:
+            logger.exception(
+                'Notification failure during customer soft delete customer_id=%s',
+                customer.id,
+            )
 
         logger.info('Customer soft deleted successfully id=%s', customer.id)
         return SoftDeleteCustomerOutput(customer_id=customer.id)

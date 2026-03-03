@@ -10,6 +10,13 @@ from common.domain.exceptions.base_exception import DomainException
 from customer.application.create_customer import CreateCustomerService
 from customer.forms.customer_forms import CreateCustomerForm
 from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
+from notification.application.create_notification import CreateNotificationService
+from notification.infrastructure.customer_notification_adapter import (
+    CustomerNotificationAdapter,
+)
+from notification.infrastructure.django_notification_repository import (
+    DjangoNotificationRepository,
+)
 
 
 class CreateCustomerView(FormView):
@@ -22,7 +29,10 @@ class CreateCustomerView(FormView):
         audit_repository = DjangoAuditRepository()
         audit_service = CreateAuditService(audit_repository)
         audit_gateway = CustomerAuditAdapter(audit_service)
-        return CreateCustomerService(repository, audit_gateway)
+        notification_repository = DjangoNotificationRepository()
+        notification_service = CreateNotificationService(notification_repository)
+        notification_gateway = CustomerNotificationAdapter(notification_service)
+        return CreateCustomerService(repository, audit_gateway, notification_gateway)
 
     def get_context_data(self, **kwargs: object) -> dict[str, object]:
         context = super().get_context_data(**kwargs)

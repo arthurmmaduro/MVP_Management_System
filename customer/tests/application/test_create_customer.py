@@ -13,8 +13,12 @@ from customer.domain.exceptions.customer_exceptions import (
     CustomerNameIsTooShort,
 )
 from customer.domain.repository.customer_audit_gateway import CustomerAuditGateway
+from customer.domain.repository.customer_notification_gateway import (
+    CustomerNotificationGateway,
+)
 from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
 from customer.models import Customer
+from notification.domain.exceptions.notification_exception import NotificationSaveFailed
 
 
 class TestCreateCustomerService(TestCase):
@@ -24,9 +28,12 @@ class TestCreateCustomerService(TestCase):
         )
         self.repository = DjangoCustomerRepository()
         self.audit_gateway = Mock(spec=CustomerAuditGateway)
+        self.notification_gateway = Mock(spec=CustomerNotificationGateway)
 
     def test_execute_creates_customer_and_returns_id(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         input_dto = CreateCustomerInput(
             name='Test Customer', created_by=self.user.id, updated_by=self.user.id
         )
@@ -38,9 +45,15 @@ class TestCreateCustomerService(TestCase):
             customer_id=output.customer_id,
             created_by=self.user.id,
         )
+        self.notification_gateway.notify_customer_created.assert_called_once_with(
+            customer_id=output.customer_id,
+            triggered_by=self.user.id,
+        )
 
     def test_execute_uses_default_is_active_true(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         input_dto = CreateCustomerInput(
             name='Test Customer', created_by=self.user.id, updated_by=self.user.id
         )
@@ -50,7 +63,9 @@ class TestCreateCustomerService(TestCase):
         self.assertTrue(customer.is_active)
 
     def test_execute_creates_timestamp(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         input_dto = CreateCustomerInput(
             name='Test Customer', created_by=self.user.id, updated_by=self.user.id
         )
@@ -62,7 +77,9 @@ class TestCreateCustomerService(TestCase):
         self.assertLessEqual(customer.created_at, customer.updated_at)
 
     def test_execute_raises_when_customer_name_already_exists(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         Customer.objects.create(
             name='Duplicated Customer',
             created_by_id=self.user.id,
@@ -78,7 +95,9 @@ class TestCreateCustomerService(TestCase):
             service.execute(input_dto)
 
     def test_execute_raises_when_customer_name_is_invalid(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
 
         with self.assertRaises(CustomerNameIsEmpty):
             service.execute(
@@ -99,7 +118,9 @@ class TestCreateCustomerService(TestCase):
             )
 
     def test_execute_raises_customer_audit_failed_when_audit_fails(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         self.audit_gateway.log_customer_created.side_effect = AuditSaveFailed(
             'create', 'customer'
         )
@@ -116,7 +137,9 @@ class TestCreateCustomerService(TestCase):
         self.assertFalse(Customer.objects.filter(name='Test Customer').exists())
 
     def test_execute_logs_exception_when_audit_fails(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
         self.audit_gateway.log_customer_created.side_effect = AuditSaveFailed(
             'create', 'customer'
         )
@@ -139,7 +162,9 @@ class TestCreateCustomerService(TestCase):
         )
 
     def test_execute_logs_start_and_success(self):
-        service = CreateCustomerService(self.repository, self.audit_gateway)
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
 
         with patch('customer.application.create_customer.logger') as logger_mock:
             output = service.execute(
@@ -153,4 +178,27 @@ class TestCreateCustomerService(TestCase):
         logger_mock.info.assert_any_call('Starting customer creation')
         logger_mock.info.assert_any_call(
             'Customer created successfully id=%s', output.customer_id
+        )
+
+    def test_execute_logs_exception_when_notification_fails_and_keeps_customer(self):
+        service = CreateCustomerService(
+            self.repository, self.audit_gateway, self.notification_gateway
+        )
+        self.notification_gateway.notify_customer_created.side_effect = (
+            NotificationSaveFailed('create', 'customer')
+        )
+
+        with patch('customer.application.create_customer.logger') as logger_mock:
+            output = service.execute(
+                CreateCustomerInput(
+                    name='Test Customer',
+                    created_by=self.user.id,
+                    updated_by=self.user.id,
+                )
+            )
+
+        self.assertTrue(Customer.objects.filter(pk=output.customer_id).exists())
+        logger_mock.exception.assert_called_once_with(
+            'Notification failure during customer creation customer_id=%s',
+            output.customer_id,
         )

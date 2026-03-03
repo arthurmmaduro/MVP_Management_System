@@ -1,3 +1,4 @@
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from notification.domain.enums.notification_action import NotificationAction
@@ -11,6 +12,8 @@ class CreateNotificationInput:
     entity_id: int | None
     triggered_by: int
     audience: NotificationAudience
+    description: str
+    metadata: Mapping[str, object]
 
 
 @dataclass(frozen=True, slots=True)

@@ -12,6 +12,13 @@ from customer.domain.exceptions.customer_exceptions import CustomerNotFound
 from customer.forms.customer_forms import UpdateCustomerForm
 from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
 from customer.models import Customer
+from notification.application.create_notification import CreateNotificationService
+from notification.infrastructure.customer_notification_adapter import (
+    CustomerNotificationAdapter,
+)
+from notification.infrastructure.django_notification_repository import (
+    DjangoNotificationRepository,
+)
 
 
 class UpdateCustomerView(FormView):
@@ -25,7 +32,10 @@ class UpdateCustomerView(FormView):
         audit_repository = DjangoAuditRepository()
         audit_service = CreateAuditService(audit_repository)
         audit_gateway = CustomerAuditAdapter(audit_service)
-        return UpdateCustomerService(repository, audit_gateway)
+        notification_repository = DjangoNotificationRepository()
+        notification_service = CreateNotificationService(notification_repository)
+        notification_gateway = CustomerNotificationAdapter(notification_service)
+        return UpdateCustomerService(repository, audit_gateway, notification_gateway)
 
     def get_customer(self):
         if self._customer is not None:

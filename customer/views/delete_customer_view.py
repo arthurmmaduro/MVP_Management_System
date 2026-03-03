@@ -12,6 +12,13 @@ from customer.domain.dto.soft_delete_customer_dto import SoftDeleteCustomerInput
 from customer.domain.exceptions.customer_exceptions import CustomerNotFound
 from customer.infrastructure.django_customer_repository import DjangoCustomerRepository
 from customer.models import Customer
+from notification.application.create_notification import CreateNotificationService
+from notification.infrastructure.customer_notification_adapter import (
+    CustomerNotificationAdapter,
+)
+from notification.infrastructure.django_notification_repository import (
+    DjangoNotificationRepository,
+)
 
 
 class DeleteCustomerView(TemplateView):
@@ -23,7 +30,12 @@ class DeleteCustomerView(TemplateView):
         audit_repository = DjangoAuditRepository()
         audit_service = CreateAuditService(audit_repository)
         audit_gateway = CustomerAuditAdapter(audit_service)
-        return SoftDeleteCustomerService(repository, audit_gateway)
+        notification_repository = DjangoNotificationRepository()
+        notification_service = CreateNotificationService(notification_repository)
+        notification_gateway = CustomerNotificationAdapter(notification_service)
+        return SoftDeleteCustomerService(
+            repository, audit_gateway, notification_gateway
+        )
 
     def get_customer(self) -> Customer:
         if self._customer is not None:

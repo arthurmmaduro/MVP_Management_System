@@ -26,6 +26,8 @@ class Notification(models.Model):
     )
     audience = models.CharField(max_length=50, choices=NOTIFICATION_AUDIENCE_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
+    description = models.TextField(blank=True)
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         db_table = 'notification'
