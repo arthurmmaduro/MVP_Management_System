@@ -56,6 +56,7 @@ class TestNotificationModel(TestCase):
             entity_type='order',
             entity_id=7,
             triggered_by=self.user,
+            audience=NotificationAudience.ANALYST,
         )
 
         self.assertEqual(str(audit), 'update order #7')
